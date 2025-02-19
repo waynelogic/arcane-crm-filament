@@ -19,6 +19,7 @@ class WorkAreaResource extends Resource
 
     protected static ?string $label = 'Направление работы';
     protected static ?string $pluralLabel = 'Направления';
+    protected static ?string $navigationGroup = 'Справочники';
     protected static ?string $navigationIcon = 'phosphor-intersect-three';
     protected static ?string $activeNavigationIcon = 'phosphor-intersect-three-fill';
 

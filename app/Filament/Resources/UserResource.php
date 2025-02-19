@@ -21,6 +21,7 @@ class UserResource extends Resource
 
     protected static ?string $label = 'Контакт';
     protected static ?string $pluralLabel = 'Контакты';
+    protected static ?string $navigationGroup = 'Взаимодействия';
     protected static ?string $navigationIcon = 'phosphor-address-book';
     protected static ?string $activeNavigationIcon = 'phosphor-address-book-fill';
 
@@ -51,15 +52,34 @@ class UserResource extends Resource
                 ->prefixIcon('phosphor-calendar'),
 
             Forms\Components\Section::make('Личный кабинет')->schema([
-                Forms\Components\DateTimePicker::make('email_verified_at')
-                    ->label('Дата верификации')
-                    ->prefixIcon('phosphor-calendar-check'),
-                Forms\Components\TextInput::make('password')
-                    ->label('Пароль')
-                    ->prefixIcon('phosphor-lock')
-                    ->password()
-                    ->maxLength(255),
-            ])->columns(2)
+                Forms\Components\Toggle::make('account_is_active')
+                    ->label('Аккаунт активен')
+                    ->inline(false)
+                    ->default(false)
+                    ->live()
+                    ->columnSpan('full'),
+
+                Forms\Components\Group::make([
+                    Forms\Components\DateTimePicker::make('email_verified_at')
+                        ->label('Дата верификации')
+                        ->prefixIcon('phosphor-calendar-check'),
+                    Forms\Components\TextInput::make('password')
+                        ->label('Пароль')
+                        ->prefixIcon('phosphor-lock')
+                        ->suffixAction(
+                            Forms\Components\Actions\Action::make('generatePassword')
+                                ->label('Сгенерировать')
+                                ->icon('phosphor-dice-six')
+                                ->action(function (Forms\Set $set) {
+                                    $set('password', fake()->password());
+                                })
+                        )
+                        ->password()
+                        ->maxLength(255),
+                ])->disabled(fn (Forms\Get $get) => !$get('account_is_active'))
+                    ->hidden(fn (Forms\Get $get) => !$get('account_is_active'))
+                    ->columns(2),
+            ])
         ]);
     }
 

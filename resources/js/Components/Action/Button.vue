@@ -31,7 +31,7 @@ const btnClasses = tv({
     variants: {
         color: {
             white: 'text-gray-700 bg-white hover:bg-gray-50 border-gray-300',
-            black: 'text-white bg-black hover:bg-gray-900',
+            black: 'text-white bg-neutral-900 hover:bg-neutral-600',
             primary: 'text-white bg-primary-600 hover:bg-primary-700',
             secondary: 'text-gray-700 bg-gray-100 hover:bg-gray-200',
             danger: 'text-white bg-red-600 hover:bg-red-700',

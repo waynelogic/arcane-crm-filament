@@ -34,10 +34,18 @@ class PhoneCall extends FileModel
         $this->update(['transcription' => $text]);
     }
 
-    public function aiGenerate()
+    public function aiGenerateEvent(): void
     {
         $obChat = OpenAI::make();
-        $data = $obChat->phoneCall($this->transcription);
-        dd($data);
+        $data = $obChat->getPhoneCallEvent($this->transcription, $this->created_at);
+        $aiPayload = [
+            'event' => [
+                'title' => $data->title,
+                'start' => $data->start,
+                'duration' => $data->duration,
+                'description' => $data->description ?? '',
+            ],
+        ];
+        $this->update(['ai_payload' => $aiPayload]);
     }
 }

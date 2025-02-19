@@ -33,6 +33,9 @@ export default {
                     '950': '#262640',
                     DEFAULT: '#6e70c0',
                 },
+            },
+            minHeight: {
+                'svh': '100svh',
             }
         },
         container: {

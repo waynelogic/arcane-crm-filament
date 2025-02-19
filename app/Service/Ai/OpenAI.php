@@ -3,6 +3,7 @@
 namespace App\Service\Ai;
 
 use App\Enums\AiModels;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 
 class OpenAI
@@ -12,7 +13,7 @@ class OpenAI
         return new OpenAI();
     }
 
-    public function phoneCall($transcription)
+    public function phoneCallEve($transcription)
     {
         $options = [
             'messages' => [
@@ -67,26 +68,60 @@ class OpenAI
         return $this->chat($options);
     }
 
+    public function getPhoneCallEvent(string $transcription, Carbon $time = null)
+    {
+        $time = $time ?? now();
+
+        $instruction = 'Отвечаешь всегда на русском. Я отправляю тебе текст. В тексте могут быть события, например договорились о созвоне. К примеру если написано ок завтра в 12 совещание то создаем event на завтра на 12. Если говорится про вторник - то надо ставить ближайший вторник. Если говорилось про месяц еще и месяц указываем.';
+
+        $options = [
+            'messages' => [
+                [
+                    'role' => 'system',
+                    'content' => $instruction,
+                ],
+                [
+                    'role' => 'user',
+                    'content' => 'Текущее время: ' . $time->format('d.m.Y H:i') . '. Транскрипция телефонного звонка: ' . $transcription,
+                ],
+            ],
+            'response_format' => [
+                'type' => 'json_schema',
+                'json_schema' => (object) [
+                    'name' => 'event',
+                    "schema" => [
+                        "type" => "object",
+                        "properties" => [
+                            "title" => [
+                                "type" => "string",
+                                "description" => "Название события",
+                            ],
+                            "description" => [
+                                "type" => "string",
+                                "description" => "Описание события",
+                            ],
+                            "start" => [
+                                "type" => "string",
+                                "description" => "Дата и время начала события в формате dd.mm.yyyy hh:mm",
+                            ],
+                            "duration" => [
+                                "type" => "number",
+                                "description" => "Продолжительность события в часах",
+                            ],
+                        ],
+                        "required" => ["title", "start", "duration"]
+                    ]
+                ]
+            ]
+        ];
+
+        return $this->chat($options);
+    }
+
     public function chat(array $options)
     {
-//        $url = 'http://10.8.63.6:1234/v1/chat/completions';
-//
-//        $defaultOptions = [
-//            "model" => AiModels::QWEN->value,
-//            'temperature' => 0.7,
-//            'max_tokens' => -1,
-//            'stream' => false
-//        ];
-//
-//        $response = \Http::withHeaders([
-//            'Content-Type' => 'application/json',
-//        ])->post($url, [...$defaultOptions, ...$options]);
-
-//        dd($response->json());
-
-
         $obAi = \OpenAI::factory()
-            ->withBaseUri('http://10.8.63.6:1234/v1')
+            ->withBaseUri('http://10.8.98.29:1234/v1')
             ->withOrganization('organization_owner')
             ->make();
 
@@ -94,10 +129,9 @@ class OpenAI
             'model' => AiModels::QWEN->value,
             ...$options
         ]);
-        $content = $result->choices[0]->message->content;
+        $content = $result->choices[0]->message->content ?? null;
+        dd($content);
 
         return json_decode($content);
-//
-//        return $result->choices[0]->message->content;
     }
 }

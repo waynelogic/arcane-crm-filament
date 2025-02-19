@@ -39,11 +39,40 @@ const alignmentClasses = computed(() => {
     }
 });
 
+const directionClass = computed(() => {
+    if (shouldOpenUpward.value) {
+        return 'bottom-full';
+    } else {
+        return 'top-full';
+    }
+});
+
+const triggerRef = ref<HTMLElement | null>(null);
 const open = ref(false);
+const shouldOpenUpward = ref(false);
+
+const checkDropdownPosition = () => {
+    if (triggerRef.value) {
+        const rect = triggerRef.value.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+
+        // Если нет места внизу, открываем вверх
+        shouldOpenUpward.value = rect.bottom + 200 > windowHeight; // 200 - примерная высота дропдауна
+    }
+};
+
+onMounted(() => {
+    checkDropdownPosition();
+    window.addEventListener('resize', checkDropdownPosition);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('resize', checkDropdownPosition);
+});
 </script>
 
 <template>
-    <div class="relative">
+    <div class="relative" ref="triggerRef">
         <div @click="open = !open">
             <slot name="trigger" />
         </div>
@@ -65,8 +94,8 @@ const open = ref(false);
         >
             <div
                 v-show="open"
-                class="absolute z-50 mt-2 rounded-md shadow-lg"
-                :class="[widthClass, alignmentClasses]"
+                class="absolute z-50 rounded-md shadow-lg"
+                :class="[widthClass, alignmentClasses, directionClass]"
                 style="display: none"
                 @click="open = false"
             >

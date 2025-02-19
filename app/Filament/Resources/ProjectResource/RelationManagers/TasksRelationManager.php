@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ProjectResource\RelationManagers;
 
+use App\Enums\TaskStatus;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class TasksRelationManager extends RelationManager
 {
     protected static string $relationship = 'tasks';
+
+    protected static ?string $title = 'Задачи';
 
     public function form(Form $form): Form
     {
@@ -29,7 +32,14 @@ class TasksRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('title')
             ->columns([
-                Tables\Columns\TextColumn::make('title'),
+                Tables\Columns\TextColumn::make('title')
+                    ->label('Название'),
+                Tables\Columns\SelectColumn::make('status')
+                    ->label('Статус')
+                    ->options(TaskStatus::class),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Дата создания')
+                    ->dateTime(),
             ])
             ->filters([
                 //

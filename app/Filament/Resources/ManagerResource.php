@@ -20,6 +20,7 @@ class ManagerResource extends Resource
 
     protected static ?string $label = 'Менеджер';
     protected static ?string $pluralLabel = 'Менеджеры';
+    protected static ?string $navigationGroup = 'Справочники';
     protected static ?string $navigationLabel = 'Команда';
     protected static ?string $navigationIcon = 'phosphor-users-three';
     protected static ?string $activeNavigationIcon = 'phosphor-users-three-fill';

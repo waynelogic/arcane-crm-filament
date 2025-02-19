@@ -2,6 +2,8 @@
 
 namespace App\Service\Database\Traits;
 
+use function Termwind\render;
+
 trait HasExternalId
 {
     public static function bootHasExternalId()

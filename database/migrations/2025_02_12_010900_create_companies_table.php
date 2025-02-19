@@ -27,10 +27,11 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
+
         Schema::create('company_users', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies');
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnUpdate();
             $table->string('position')->nullable();
             $table->string('role')->nullable();
             $table->integer('sort_order')->default(0);

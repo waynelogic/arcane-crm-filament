@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PhoneCallResource\Pages;
 
 use App\Filament\Resources\PhoneCallResource;
+use App\Models\PhoneCall;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -21,26 +22,32 @@ class EditPhoneCall extends EditRecord
                     $record->newContact();
                 }),
 
-            Actions\Action::make('ai-generate')
-                ->label('AI Анализ')
-                ->color('success')
-                ->requiresConfirmation(function ($record) {
-                    return $record->ai_payload;
-                })
+
+            Actions\ActionGroup::make([
+                Actions\Action::make('ai-generate')
+                    ->label('AI Событие')
+                    ->requiresConfirmation(function ($record) {
+                        return $record->ai_payload;
+                    })
+                    ->icon('phosphor-calendar')
+                    ->action(function (PhoneCall $record) {
+                        $record->aiGenerateEvent();
+                        $this->refreshFormData([
+                            'ai_payload'
+                        ]);
+                    }),
+            ])->label('AI Анализ')
                 ->icon('phosphor-open-ai-logo')
-                ->action(function ($record) {
-                    $record->aiGenerate();
-                    $this->refreshFormData([
-                        'transcription'
-                    ]);
-                }),
+                ->button()
+                ->color('warning'),
+
             Actions\Action::make('transcribe')
                 ->label('Транскрибировать')
                 ->requiresConfirmation(function ($record) {
                     return $record->transcription;
                 })
                 ->icon('heroicon-o-chat-bubble-bottom-center-text')
-                ->action(function ($record) {
+                ->action(function (PhoneCall $record) {
                     $record->transcribe();
                     $this->refreshFormData([
                         'transcription'

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Company;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
@@ -30,9 +31,11 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $company = session()->get('current_company');
         return [
             ...parent::share($request),
             'auth' => [
+                'company' => fn() => $company ? Company::find($company) : null,
                 'user' => $request->user(),
             ],
             'ziggy' => fn () => [

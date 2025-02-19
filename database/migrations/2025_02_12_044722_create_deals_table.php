@@ -21,8 +21,10 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('status')->nullable();
+            $table->decimal('price', 12, 2)->nullable();
             $table->decimal('total_price', 12, 2)->nullable();
             $table->decimal('total_discount', 12, 2)->nullable();
+            $table->json('product_items')->nullable();
             $table->boolean('auto_price')->default(false);
             $table->boolean('completed')->default(false);
             $table->boolean('canceled')->default(false);

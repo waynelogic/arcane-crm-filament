@@ -19,6 +19,7 @@ class ProjectResource extends Resource
 
     protected static ?string $label = 'Проект';
     protected static ?string $pluralLabel = 'Проекты';
+    protected static ?string $navigationGroup = 'Деяльность';
     protected static ?string $navigationIcon = 'phosphor-blueprint';
     protected static ?string $activeNavigationIcon = 'phosphor-blueprint-fill';
 

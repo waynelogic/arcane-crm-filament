@@ -24,6 +24,7 @@
         "vue-tsc": "^2.0.24"
     },
     "dependencies": {
+        "@phosphor-icons/vue": "^2.2.1",
         "tailwind-variants": "^0.3.1"
     }
 }

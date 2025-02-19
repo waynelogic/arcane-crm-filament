@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use App\Enums\TaskStatus;
 use App\Filament\Forms\Components\StatusButtons;
 use App\Filament\Resources\TaskResource\Pages;
-use App\Filament\Resources\TaskResource\RelationManagers;
 use App\Models\Task;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -19,6 +18,7 @@ class TaskResource extends Resource
 
     protected static ?string $label = 'Задача';
     protected static ?string $pluralLabel = 'Задачи';
+    protected static ?string $navigationGroup = 'Деяльность';
     protected static ?string $navigationIcon = 'phosphor-cards-three';
     protected static ?string $activeNavigationIcon = 'phosphor-cards-three-fill';
 
@@ -28,6 +28,7 @@ class TaskResource extends Resource
             Forms\Components\Group::make([
 
                 StatusButtons::make('status')
+                    ->hiddenLabel()
                     ->options(TaskStatus::class)
                     ->default(TaskStatus::NEW)
                     ->required(),
@@ -57,28 +58,38 @@ class TaskResource extends Resource
             ])->columnSpan(['lg' => 2]),
 
             Forms\Components\Group::make([
-                Forms\Components\Group::make([
-                    Forms\Components\Section::make('Связи')->schema([
-                        Forms\Components\Select::make('manager_id')
-                            ->label('Менеджер')
-                            ->prefixIcon('phosphor-users-three')
-                            ->preload()
-                            ->native(false)
-                            ->relationship('manager', 'name')
-                            ->default(auth()->user()->id)
-                            ->required(),
-                        Forms\Components\Select::make('project_id')
-                            ->relationship('project', 'name'),
-                        Forms\Components\Select::make('deal_id')
-                            ->label('Сделка')
-                            ->prefixIcon('heroicon-o-briefcase')
-                            ->relationship('deal', 'title'),
-                        Forms\Components\Select::make('parent_id')
-                            ->label('Родитель')
-                            ->relationship(name: 'parent', titleAttribute: 'title'),
-                        Forms\Components\Select::make('work_area_id')
-                            ->relationship('workArea', 'name'),
-                    ]),
+                Forms\Components\Section::make('Парамерты')->schema([
+                    Forms\Components\DateTimePicker::make('deadline')
+                        ->label('Дедлайн'),
+//                    Forms\Components\TextInput::make('hour_price')
+//                        ->numeric(),
+
+                    Forms\Components\TextInput::make('hours')
+                        ->label('Часы')
+                        ->numeric(),
+                ]),
+                Forms\Components\Section::make('Связи')->schema([
+                    Forms\Components\Select::make('manager_id')
+                        ->label('Менеджер')
+                        ->prefixIcon('phosphor-users-three')
+                        ->preload()
+                        ->native(false)
+                        ->relationship('manager', 'name')
+                        ->default(auth()->user()->id)
+                        ->required(),
+                    Forms\Components\Select::make('project_id')
+                        ->label('Проект')
+                        ->relationship('project', 'name'),
+                    Forms\Components\Select::make('deal_id')
+                        ->label('Сделка')
+                        ->prefixIcon('heroicon-o-briefcase')
+                        ->relationship('deal', 'title'),
+                    Forms\Components\Select::make('parent_id')
+                        ->label('Родитель')
+                        ->relationship(name: 'parent', titleAttribute: 'title'),
+                    Forms\Components\Select::make('work_area_id')
+                        ->label('Рабочая область')
+                        ->relationship('workArea', 'name'),
                 ]),
             ]),
 
@@ -93,20 +104,11 @@ class TaskResource extends Resource
 
 
 
-
-
-            Forms\Components\DateTimePicker::make('deadline'),
-            Forms\Components\TextInput::make('hour_price')
-                ->numeric(),
-            Forms\Components\TextInput::make('work_status')
-                ->maxLength(255),
-            Forms\Components\TextInput::make('hours')
-                ->numeric(),
-            Forms\Components\TextInput::make('work_time')
-                ->numeric(),
-            Forms\Components\DateTimePicker::make('played_at'),
-            Forms\Components\DateTimePicker::make('started_at'),
-            Forms\Components\DateTimePicker::make('completed_at'),
+//            Forms\Components\TextInput::make('work_time')
+//                ->numeric(),
+//            Forms\Components\DateTimePicker::make('played_at'),
+//            Forms\Components\DateTimePicker::make('started_at'),
+//            Forms\Components\DateTimePicker::make('completed_at'),
         ])->columns(['lg' => 3]);
     }
 

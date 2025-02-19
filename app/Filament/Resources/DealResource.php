@@ -3,11 +3,13 @@
 namespace App\Filament\Resources;
 
 use App\Enums\DealStatus;
+use App\Enums\ProductType;
 use App\Filament\Forms\Components\StatusButtons;
 use App\Filament\Resources\DealResource\Pages;
 use App\Filament\Resources\DealResource\RelationManagers;
 use App\Models\Company;
 use App\Models\Deal;
+use App\Models\Product;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -23,6 +25,8 @@ class DealResource extends Resource
 
     protected static ?string $label = 'Сделка';
     protected static ?string $pluralLabel = 'Сделки';
+
+    protected static ?string $navigationGroup = 'Деяльность';
 
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
     protected static ?string $activeNavigationIcon = 'heroicon-s-briefcase';
@@ -55,7 +59,7 @@ class DealResource extends Resource
                     ]),
 
                     Forms\Components\Section::make('Расчеты')->schema([
-                        Forms\Components\TextInput::make('total_price')
+                        Forms\Components\TextInput::make('price')
                             ->label('Стоимость')
                             ->required()
                             ->prefixIcon('heroicon-o-banknotes')
@@ -68,6 +72,29 @@ class DealResource extends Resource
                             ->label('Автоматическая цена')
                             ->required(),
                     ])->columns(2),
+
+                    Forms\Components\Repeater::make('product_items')->schema([
+                        Forms\Components\Select::make('product_id')
+                            ->label('Товар')
+                            ->preload()
+                            ->live()
+                            ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('price', Product::find($state)->price) : null)
+                            ->native(false)
+                            ->options(Product::query()->where('type', ProductType::PRODUCT)->pluck('name', 'id'))
+                            ->searchable()
+                            ->required(),
+                        Forms\Components\TextInput::make('quantity')
+                            ->label('Количество')
+                            ->numeric()
+                            ->required(),
+                        Forms\Components\TextInput::make('price')
+                            ->label('Цена')
+                            ->numeric()
+                            ->required(),
+                    ])->defaultItems(0)
+                        ->label('Товары')
+                        ->addActionLabel('Добавить товар')
+                        ->columns(1),
 
                 ]),
 
@@ -185,7 +212,7 @@ class DealResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            DealResource\RelationManagers\TasksRelationManager::class,
         ];
     }
 

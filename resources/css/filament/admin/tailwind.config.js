@@ -7,6 +7,7 @@ export default {
         './resources/views/filament/**/*.blade.php',
         './vendor/filament/**/*.blade.php',
         './resources/views/vendor/filament*/**/*.blade.php',
-        './resources/views/filament/**/*.blade.php'
+        './resources/views/filament/**/*.blade.php',
+        './vendor/guava/calendar/resources/**/*.blade.php',
     ],
 }

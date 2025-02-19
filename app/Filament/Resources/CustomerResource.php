@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class CustomerResource extends Resource
 {
@@ -19,66 +20,79 @@ class CustomerResource extends Resource
 
     protected static ?string $label = 'Клиент';
     protected static ?string $pluralLabel = 'Клиенты';
+
+    protected static ?string $navigationGroup = 'Взаимодействия';
     protected static ?string $navigationIcon = 'phosphor-users';
     protected static ?string $activeNavigationIcon = 'phosphor-users-fill';
 
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\Fieldset::make('Отношения')->schema([
-                Forms\Components\Toggle::make('is_customer')
-                    ->label('Покупатель')
-                    ->default(true)
+            Forms\Components\Group::make([
+                Forms\Components\Fieldset::make('Отношения')->schema([
+                    Forms\Components\Toggle::make('is_customer')
+                        ->label('Покупатель')
+                        ->default(true)
+                        ->required(),
+                    Forms\Components\Toggle::make('is_supplier')
+                        ->label('Поставщик')
+                        ->required(),
+                ]),
+                Forms\Components\TextInput::make('legal_name')
+                    ->label('Юридическое наименование')
+                    ->prefixIcon('phosphor-building')
+                    ->maxLength(255),
+
+
+                Forms\Components\TextInput::make('inn')
+                    ->label('ИНН')
+                    ->prefixIcon('phosphor-book-open-text')
+                    ->maxLength(12),
+                Forms\Components\TextInput::make('kpp')
+                    ->label('КПП')
+                    ->prefixIcon('phosphor-arrow-bend-down-left')
+                    ->disabled(fn(Forms\Get $get) => strlen($get('inn')) > 10)
+                    ->maxLength(9),
+                Forms\Components\TextInput::make('email')
+                    ->label('Электронная почта')
+                    ->prefixIcon('phosphor-envelope-simple')
+                    ->email()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('address')
+                    ->label('Адрес')
+                    ->prefixIcon('phosphor-map-pin')
+                    ->maxLength(255),
+                Forms\Components\Toggle::make('active')
                     ->required(),
-                Forms\Components\Toggle::make('is_supplier')
-                    ->label('Поставщик')
-                    ->required(),
+
+            ])->columnSpan(['lg' => 2])->columns(2),
+
+            Forms\Components\Group::make([
+
+                SpatieMediaLibraryFileUpload::make('company_logo')
+                    ->label('Логотип')
+                    ->collection('company_logos'),
+
+                Forms\Components\TextInput::make('name')
+                    ->label('Название')
+                    ->prefixIcon('phosphor-tag')
+                    ->required()
+                    ->maxLength(255),
+
+//                Forms\Components\TextInput::make('external_id')
+//                    ->label('Идентификатор')
+//                    ->disabled()
+//                    ->maxLength(36),
+                Forms\Components\Select::make('manager_id')
+                    ->label('Ответственный')
+                    ->prefixIcon('phosphor-user')
+                    ->preload()
+                    ->native(false)
+                    ->default(auth()->user()->id)
+                    ->relationship('manager', 'name'),
             ]),
 
-            Forms\Components\TextInput::make('external_id')
-                ->maxLength(36),
-            Forms\Components\Select::make('manager_id')
-                ->label('Ответственный')
-                ->prefixIcon('phosphor-user')
-                ->preload()
-                ->native(false)
-                ->default(auth()->user()->id)
-                ->relationship('manager', 'name'),
-
-
-            Forms\Components\TextInput::make('name')
-                ->label('Название')
-                ->prefixIcon('phosphor-tag')
-                ->required()
-                ->maxLength(255),
-            Forms\Components\TextInput::make('legal_name')
-                ->label('Юридическое наименование')
-                ->prefixIcon('phosphor-building')
-                ->maxLength(255),
-
-
-            Forms\Components\TextInput::make('inn')
-                ->label('ИНН')
-                ->prefixIcon('phosphor-book-open-text')
-                ->maxLength(12),
-            Forms\Components\TextInput::make('kpp')
-                ->label('КПП')
-                ->prefixIcon('phosphor-arrow-bend-down-left')
-                ->disabled(fn(Forms\Get $get) => strlen($get('inn')) > 10)
-                ->maxLength(9),
-            Forms\Components\TextInput::make('email')
-                ->label('Электронная почта')
-                ->prefixIcon('phosphor-envelope-simple')
-                ->email()
-                ->maxLength(255),
-            Forms\Components\TextInput::make('address')
-                ->label('Адрес')
-                ->prefixIcon('phosphor-map-pin')
-                ->maxLength(255),
-            Forms\Components\Toggle::make('active')
-                ->required(),
-
-        ]);
+        ])->columns(['lg' => 3]);
     }
 
     public static function table(Table $table): Table

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Forms\Components\PhoneInput;
 use App\Filament\Resources\PhoneCallResource\Pages;
 use App\Filament\Resources\PhoneCallResource\RelationManagers;
 use App\Models\PhoneCall;
@@ -22,6 +23,7 @@ class PhoneCallResource extends Resource
 
     protected static ?string $label = 'Звонок';
     protected static ?string $pluralLabel = 'Звонки';
+    protected static ?string $navigationGroup = 'Взаимодействия';
     protected static ?string $navigationIcon = 'phosphor-phone-call';
     protected static ?string $activeNavigationIcon = 'phosphor-phone-call-fill';
 
@@ -30,11 +32,7 @@ class PhoneCallResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make(null)->schema([
-                    Forms\Components\TextInput::make('phone')
-                        ->label('Телефон')
-                        ->mask('+7 (999) 999-99-99')
-                        ->prefixIcon('heroicon-o-microphone')
-                        ->required(),
+                    PhoneInput::make('phone'),
 
                     Forms\Components\Select::make('contact_id')
                         ->label('Контакт')
@@ -44,8 +42,6 @@ class PhoneCallResource extends Resource
                                 ->label('Новый контакт')
                                 ->icon('heroicon-o-user')
                                 ->form([
-                                    Forms\Components\Select::make('partner_id')
-                                        ->relationship('partner', 'name'),
                                     Forms\Components\TextInput::make('name')
                                         ->required()
                                         ->maxLength(255)
@@ -63,7 +59,6 @@ class PhoneCallResource extends Resource
                                             ->send();
                                     } else {
                                         $obContact = User::create([
-                                            'partner_id' => $data['partner_id'],
                                             'name' => $data['name'],
                                             'phone' => $phone
                                         ]);
@@ -100,6 +95,42 @@ class PhoneCallResource extends Resource
                     ->autosize()
                     ->hidden(fn ($record) => !$record || empty($record->transcription))
                     ->columnSpan('full'),
+
+                Forms\Components\Tabs::make('Tabs')->tabs([
+
+                    Forms\Components\Tabs\Tab::make('События')->schema([
+                        Forms\Components\TextInput::make('title')
+                            ->label('Заголовок'),
+                        Forms\Components\Textarea::make('description')
+                            ->label('Описание'),
+                        Forms\Components\DateTimePicker::make('start')
+                            ->label('Начало')
+                            ->seconds(false),
+                        Forms\Components\TextInput::make('duration')
+                            ->label('Длительность')
+                            ->numeric(),
+                        Forms\Components\Actions::make([
+                            Forms\Components\Actions\Action::make('create_event')
+                                ->label('Создать событие')
+                                ->hidden(fn (PhoneCall $record) => $record->ai_payload['event']['used'] ?? false)
+                                ->action(function (PhoneCall $record) {
+                                    $record->createEvent();
+                                })
+                        ]),
+                    ])->statePath('event'),
+
+
+
+                ])
+                    ->columnSpan('full')
+                    ->hidden(function (PhoneCall $record) {
+                        if (isset($record->ai_payload['event'])) {
+                            return false;
+                        }
+                        return true;
+                    })
+                    ->statePath('ai_payload'),
+
             ]);
     }
 
@@ -107,25 +138,32 @@ class PhoneCallResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('contact.name')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('deal.title')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('manager.name')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('phone')
-                    ->searchable(),
+                    ->label('Телефон')
+                    ->description(fn($record) => $record->contact?->name ?? null)
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('contact.name')
+                    ->label('Контакт')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('deal.title')
+                    ->label('Сделка')
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('manager.name')
+                    ->label('Менеджер')
+                    ->searchable()
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('Дата')
+                    ->dateTime('d.m.Y - H:i')
+                    ->sortable(),
             ])
             ->filters([
                 //
