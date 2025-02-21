@@ -16,7 +16,7 @@ const props = defineProps({
 
 <template>
     <AppLayout>
-        <Kanban :columns="columns" :items="tasks"/>
+        <Kanban class="grow" :columns="columns" :items="tasks"/>
     </AppLayout>
 </template>
 

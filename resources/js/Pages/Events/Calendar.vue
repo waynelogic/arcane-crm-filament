@@ -2,6 +2,7 @@
 import {PhCaretLeft, PhCaretRight} from "@phosphor-icons/vue";
 import {computed, ref} from "vue";
 import Day from "@/Pages/Events/Day.vue";
+import Modal from "@/Components/Action/Modal.vue";
 
 const props = defineProps({
     events: {
@@ -41,6 +42,7 @@ const arDays = computed(() => {
     for (let i = 1; i <= totalDays; i++) {
         calendarDays.push({
             number: i,
+            date: new Date(currentYear.value, currentMonth.value, i).toISOString().split('T')[0],
             isCurrentMonth: true,
             events: [],
         });
@@ -150,11 +152,36 @@ const days = [
     { date: '2022-02-05', events: [] },
     { date: '2022-02-06', events: [] },
 ]
-const selectedDay = days.find((day) => day.isSelected)
+const selectedDay = ref(null);
+const selectDay = (day) => {
+    const events = props.events[day];
+    if (!events) {
+        return;
+    }
+    selectedDay.value = {
+        date: new Date(day),
+        name: new Date(day).toLocaleDateString('ru-Ru', { weekday: 'long' }),
+        events,
+    };
+}
 </script>
 
 <template>
-    {{ events}}
+    <Modal :show="!!selectedDay" @close="selectedDay = null">
+        <div class="p-6">
+            <h3 class="text-lg font-medium leading-6 text-gray-900">{{ selectedDay.name }}</h3>
+            <div class="flex items-center justify-between">
+                <div v-for="event in selectedDay.events" :key="event.id" class="mt-2 flex items-center space-x-3 border rounded-lg p-2 w-full">
+                    <span>
+                        {{ event.title }}
+                    </span>
+                    <time :datetime="event.datetime" class="ml-3 text-sm text-gray-500">
+                        {{ new Date(event.start).toLocaleTimeString() }}
+                    </time>
+                </div>
+            </div>
+        </div>
+    </Modal>
     <div class="lg:flex lg:h-full lg:flex-col">
         <header class="flex items-center justify-between border-b border-gray-200 px-6 py-4 lg:flex-none">
             <h1 class="text-base font-semibold leading-6 text-gray-900">
@@ -195,85 +222,17 @@ const selectedDay = days.find((day) => day.isSelected)
                 <div class="bg-white py-2">S<span class="sr-only sm:not-sr-only">un</span></div>
             </div>
             <div class="flex bg-gray-200 text-xs leading-6 text-gray-700 lg:flex-auto">
-                <div class="hidden w-full lg:grid lg:grid-cols-7 lg:grid-rows-6 lg:gap-px">
+                <div class="hidden w-full lg:grid lg:grid-cols-7 lg:gap-px">
                     <div v-for="day in arDays" :key="day.date"
                          :class="[day.isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-500', 'relative px-3 py-2']">
                         <time :datetime="day.date" :class="day.number === currentDate.getDate() ? 'flex h-6 w-6 items-center justify-center rounded-full bg-primary-600 font-semibold text-white' : undefined">
                             {{ day.number }}
                         </time>
-                        <ol v-if="day.events.length > 0" class="mt-2">
-                            <Day :events="day.events" :day="day"/>
-                            <li v-for="event in day.events.slice(0, 2)" :key="event.id">
-                                <a :href="event.href" class="group flex">
-                                    <p class="flex-auto truncate font-medium text-gray-900 group-hover:text-indigo-600">
-                                        {{ event.name }}
-                                    </p>
-                                    <time :datetime="event.datetime" class="ml-3 hidden flex-none text-gray-500 group-hover:text-indigo-600 xl:block">
-                                        {{ event.time }}
-                                    </time>
-                                </a>
-                            </li>
-                            <li v-if="day.events.length > 2" class="text-gray-500">+ {{ day.events.length - 2 }} more</li>
-                        </ol>
+                        <Day @click="selectDay(day.date)" :events="events[day.date] || []" :day="day"/>
                     </div>
-                </div>
-            </div>
-            <div class="flex bg-gray-200 text-xs leading-6 text-gray-700 lg:flex-auto">
-                <div class="hidden w-full lg:grid lg:grid-cols-7 lg:grid-rows-6 lg:gap-px">
-                    <div v-for="day in days" :key="day.date"
-                         :class="[day.isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-500', 'relative px-3 py-2']">
-                        <time :datetime="day.date"
-                              :class="day.isToday ? 'flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white' : undefined">{{
-                                day.date.split('-').pop().replace(/^0/, '') }}</time>
-                        <ol v-if="day.events.length > 0" class="mt-2">
-                            <li v-for="event in day.events.slice(0, 2)" :key="event.id">
-                                <a :href="event.href" class="group flex">
-                                    <p class="flex-auto truncate font-medium text-gray-900 group-hover:text-indigo-600">
-                                        {{ event.name }}
-                                    </p>
-                                    <time :datetime="event.datetime"
-                                          class="ml-3 hidden flex-none text-gray-500 group-hover:text-indigo-600 xl:block">{{
-                                            event.time }}</time>
-                                </a>
-                            </li>
-                            <li v-if="day.events.length > 2" class="text-gray-500">+ {{ day.events.length - 2 }} more
-                            </li>
-                        </ol>
-                    </div>
-                </div>
-                <div class="isolate grid w-full grid-cols-7 grid-rows-6 gap-px lg:hidden">
-                    <button v-for="day in days" :key="day.date" type="button"
-                            :class="[day.isCurrentMonth ? 'bg-white' : 'bg-gray-50', (day.isSelected || day.isToday) && 'font-semibold', day.isSelected && 'text-white', !day.isSelected && day.isToday && 'text-indigo-600', !day.isSelected && day.isCurrentMonth && !day.isToday && 'text-gray-900', !day.isSelected && !day.isCurrentMonth && !day.isToday && 'text-gray-500', 'flex h-14 flex-col px-3 py-2 hover:bg-gray-100 focus:z-10']">
-                        <time :datetime="day.date"
-                              :class="[day.isSelected && 'flex h-6 w-6 items-center justify-center rounded-full', day.isSelected && day.isToday && 'bg-indigo-600', day.isSelected && !day.isToday && 'bg-gray-900', 'ml-auto']">{{
-                                day.date.split('-').pop().replace(/^0/, '') }}</time>
-                        <span class="sr-only">{{ day.events.length }} events</span>
-                        <span v-if="day.events.length > 0" class="-mx-0.5 mt-auto flex flex-wrap-reverse">
-							<span v-for="event in day.events" :key="event.id"
-                                  class="mx-0.5 mb-1 h-1.5 w-1.5 rounded-full bg-gray-400" />
-						</span>
-                    </button>
                 </div>
             </div>
         </div>
-<!--        <div v-if="selectedDay?.events.length > 0" class="px-4 py-10 sm:px-6 lg:hidden">-->
-<!--            <ol-->
-<!--                class="divide-y divide-gray-100 overflow-hidden rounded-lg bg-white text-sm shadow ring-1 ring-black ring-opacity-5">-->
-<!--                <li v-for="event in selectedDay.events" :key="event.id"-->
-<!--                    class="group flex p-4 pr-6 focus-within:bg-gray-50 hover:bg-gray-50">-->
-<!--                    <div class="flex-auto">-->
-<!--                        <p class="font-semibold text-gray-900">{{ event.name }}</p>-->
-<!--                        <time :datetime="event.datetime" class="mt-2 flex items-center text-gray-700">-->
-<!--                            <ClockIcon class="mr-2 h-5 w-5 text-gray-400" aria-hidden="true" />-->
-<!--                            {{ event.time }}-->
-<!--                        </time>-->
-<!--                    </div>-->
-<!--                    <a :href="event.href"-->
-<!--                       class="ml-6 flex-none self-center rounded-md bg-white px-3 py-2 font-semibold text-gray-900 opacity-0 shadow-sm ring-1 ring-inset ring-gray-300 hover:ring-gray-400 focus:opacity-100 group-hover:opacity-100">Edit<span-->
-<!--                        class="sr-only">, {{ event.name }}</span></a>-->
-<!--                </li>-->
-<!--            </ol>-->
-<!--        </div>-->
     </div>
 </template>
 

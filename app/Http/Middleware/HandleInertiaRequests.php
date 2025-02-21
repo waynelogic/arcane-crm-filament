@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Company;
+use App\Service\CurrentCompany;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
@@ -35,7 +36,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'company' => fn() => $company ? Company::find($company) : null,
+                'company' => fn() => CurrentCompany::get(false),
                 'user' => $request->user(),
             ],
             'ziggy' => fn () => [

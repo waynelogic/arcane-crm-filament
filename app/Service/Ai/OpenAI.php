@@ -121,7 +121,7 @@ class OpenAI
     public function chat(array $options)
     {
         $obAi = \OpenAI::factory()
-            ->withBaseUri('http://10.8.98.29:1234/v1')
+            ->withBaseUri('http://10.8.109.251:1234/v1')
             ->withOrganization('organization_owner')
             ->make();
 
@@ -130,7 +130,6 @@ class OpenAI
             ...$options
         ]);
         $content = $result->choices[0]->message->content ?? null;
-        dd($content);
 
         return json_decode($content);
     }

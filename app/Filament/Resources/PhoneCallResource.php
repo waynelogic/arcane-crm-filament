@@ -115,11 +115,20 @@ class PhoneCallResource extends Resource
                                 ->hidden(fn (PhoneCall $record) => $record->ai_payload['event']['used'] ?? false)
                                 ->action(function (PhoneCall $record) {
                                     $record->createEvent();
-                                })
+                                }),
                         ]),
                     ])->statePath('event'),
 
-
+                    Forms\Components\Tabs\Tab::make('Сделка')->schema([
+                        Forms\Components\TextInput::make('title')
+                            ->label('Заголовок'),
+                        Forms\Components\Textarea::make('description')
+                            ->label('Описание')
+                            ->rows(4),
+                        Forms\Components\TextInput::make('price')
+                            ->numeric()
+                            ->label('Цена'),
+                    ])->statePath('deal'),
 
                 ])
                     ->columnSpan('full')

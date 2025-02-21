@@ -31,4 +31,6 @@ class ListTasks extends ListRecords
         }
         return $arTabs;
     }
+
+    protected ?string $maxContentWidth = 'full';
 }

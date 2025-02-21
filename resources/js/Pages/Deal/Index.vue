@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="js">
 import {ref} from "vue";
 import {money} from "@/Utils/money";
 import AppLayout from "@/Layouts/AppLayout.vue";

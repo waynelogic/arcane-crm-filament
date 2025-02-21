@@ -19,7 +19,7 @@ class CustomerResource extends Resource
     protected static ?string $model = Customer::class;
 
     protected static ?string $label = 'Клиент';
-    protected static ?string $pluralLabel = 'Клиенты';
+    protected static ?string $pluralLabel = 'Компании';
 
     protected static ?string $navigationGroup = 'Взаимодействия';
     protected static ?string $navigationIcon = 'phosphor-users';

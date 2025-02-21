@@ -24,7 +24,8 @@ class EditPhoneCall extends EditRecord
 
 
             Actions\ActionGroup::make([
-                Actions\Action::make('ai-generate')
+
+                Actions\Action::make('ai-generate-event')
                     ->label('AI Событие')
                     ->requiresConfirmation(function ($record) {
                         return $record->ai_payload;
@@ -36,6 +37,19 @@ class EditPhoneCall extends EditRecord
                             'ai_payload'
                         ]);
                     }),
+                Actions\Action::make('ai-generate-detail')
+                    ->label('AI Сделка')
+                    ->requiresConfirmation(function ($record) {
+                        return $record->ai_payload;
+                    })
+                    ->icon('heroicon-o-briefcase')
+                    ->action(function (PhoneCall $record) {
+                        $record->aiGenerateDeal();
+                        $this->refreshFormData([
+                            'ai_payload'
+                        ]);
+                    }),
+
             ])->label('AI Анализ')
                 ->icon('phosphor-open-ai-logo')
                 ->button()

@@ -18,7 +18,7 @@ const props = defineProps({
         <div
             v-for="column in columns"
             :key="column.name"
-            class="flex-1 rounded-lg px-3 py-3 column-width mr-4"
+            class="flex-1 rounded-lg px-3 py-3 min-w-80 "
         >
             <p class="text-gray-700 font-semibold font-sans tracking-wide text-sm">{{column.title}}</p>
             <KanbanItem

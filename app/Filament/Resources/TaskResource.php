@@ -126,7 +126,8 @@ class TaskResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('deal.title')
                     ->label('Сделка')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('parent.title')
                     ->label('Родитель')
                     ->toggleable(isToggledHiddenByDefault: true)
@@ -157,14 +158,18 @@ class TaskResource extends Resource
                     ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('hour_price')
+                    ->label('Цена часа')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('hours')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('work_time')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -179,6 +184,26 @@ class TaskResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('start')
+                    ->button()
+                    ->label('Начать')
+                    ->color('success')
+                    ->hidden(fn ($record) => isset($record->played_at))
+                    ->action(fn ($record) => $record->play()),
+
+                Tables\Actions\Action::make('pause')
+                    ->button()
+                    ->label('Пауза')
+                    ->color('warning')
+                    ->hidden(fn ($record) => !isset($record->played_at))
+                    ->action(fn ($record) => $record->pause()),
+
+                Tables\Actions\Action::make('stop')
+                    ->button()
+                    ->label('Стоп')
+                    ->color('danger')
+                    ->hidden(fn ($record) => !isset($record->played_at))
+                    ->action(fn ($record) => $record->stop()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

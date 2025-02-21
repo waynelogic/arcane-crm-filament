@@ -55,7 +55,17 @@ const sidebarOpen = ref(false)
         <!-- Page -->
         <main class="flex flex-1 flex-col pb-3 lg:min-w-0 lg:pt-3 lg:pr-3 lg:pl-64">
             <div class="grow p-6 lg:rounded-lg lg:bg-white lg:p-0 lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
-                <div class="mx-auto max-w-6xl">
+                <div class="mx-auto max-w-6xl px-6 h-full flex flex-col">
+                    <div class="lg:flex lg:items-center lg:justify-between mb-4 pt-6 px-4">
+                        <div class="min-w-0 flex-1">
+                            <h2 v-if="title" class="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+                                {{ title }}
+                            </h2>
+                        </div>
+                        <div class="mt-5 flex lg:mt-0 lg:ml-4">
+                            <slot name="actions"/>
+                        </div>
+                    </div>
                     <slot/>
                 </div>
             </div>
