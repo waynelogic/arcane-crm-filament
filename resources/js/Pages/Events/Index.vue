@@ -8,7 +8,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <AppLayout>
+    <AppLayout title="События">
         <Calendar :events="events"/>
     </AppLayout>
 </template>

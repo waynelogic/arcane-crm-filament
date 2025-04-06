@@ -15,6 +15,7 @@ const sidebarOpen = ref(false)
 </script>
 
 <template>
+    <Head v-if="title" :title="title"/>
     <SidePanel :show="sidebarOpen" @close="sidebarOpen = false" position="left" :background="'transparent'">
         <div class="p-3 h-full">
             <Navigation mobile/>

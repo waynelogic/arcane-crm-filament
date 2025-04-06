@@ -7,16 +7,6 @@ const props = defineProps({
         default: () => ({})
     }
 })
-const badgeColor = computed(() => {
-    const mappings = {
-        Design: "purple",
-        "Feature Request": "teal",
-        Backend: "blue",
-        QA: "green",
-        default: "teal"
-    };
-    return mappings[task.value.type] || mappings.default;
-})
 </script>
 
 <template>

@@ -107,7 +107,7 @@ const outLinks = [
                 <template #trigger>
                     <button class="flex items-center py-4">
                         <img class="size-10 shrink-0 rounded-lg mr-3" :src="$page.props.auth.user.avatar" :alt="$page.props.auth.user.name">
-                        <div class="text-start flex flex-col">
+                        <div class="text-start flex flex-col mr-3">
                             <span class="line-clamp-1 text-sm/5 font-medium text-zinc-950 dark:text-white">
                                 {{ $page.props.auth.user.name }}
                             </span>

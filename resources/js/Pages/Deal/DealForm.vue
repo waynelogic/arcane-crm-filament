@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="js">
 import FormLabel from "@/Components/Form/FormLabel.vue";
 import {useForm} from "@inertiajs/vue3";
 import TextInput from "@/Components/Form/TextInput.vue";

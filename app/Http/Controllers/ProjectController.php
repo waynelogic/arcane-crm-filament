@@ -14,11 +14,9 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $arColumns = TaskStatus::statuses();
-        $arTasks = Task::all();
         return Inertia::render('Project/Index', [
-            'columns' => $arColumns,
-            'tasks' => $arTasks
+            'columns' => fn() => TaskStatus::statuses(),
+            'tasks' => fn() => Task::all()
         ]);
     }
 

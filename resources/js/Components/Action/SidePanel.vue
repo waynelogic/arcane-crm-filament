@@ -32,7 +32,7 @@ const bgClasses = computed(() => {
             <div v-if="show" @click="emit('close')" class="bg-gray-800/50 inset-0 fixed z-40"></div>
         </transition>
         <transition enter-active-class="ease-out duration-300" leave-active-class="ease-in duration-200" :enter-from-class="position === 'left' ? '-translate-x-full' : 'translate-x-full'" enter-to-class="translate-x-0" leave-from-class="translate-x-0" :leave-to-class="position === 'left' ? '-translate-x-full' : 'translate-x-full'">
-            <div v-if="show" :class="[position === 'left' ? 'left-0' : 'right-0', 'w-2/3 h-full fixed top-0 z-50', bgClasses]">
+            <div v-if="show" :class="[position === 'left' ? 'left-0' : 'right-0', 'h-full fixed top-0 z-50', bgClasses]">
                 <slot/>
             </div>
         </transition>

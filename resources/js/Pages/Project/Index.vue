@@ -1,10 +1,10 @@
-<script setup lang="ts">
+<script setup lang="js">
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Kanban from "@/Pages/Project/Kanban.vue";
 
 const props = defineProps({
     columns: {
-        type: Object,
+        type: [Object, Array],
         required: true
     },
     tasks: {
